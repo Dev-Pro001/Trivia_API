@@ -243,36 +243,31 @@ def create_app(test_config=None):
     
     @app.route('/quizzes', methods=['POST'])
     def play():
-
         data =  request.get_json()
-        previous_questions = data['previous_questions']   
-        category_id  = data['quiz_category']['id']  
+        previous_asked_questions = data['previous_questions']   
+        quiz_category_id  = data['quiz_category']['id']  
+        try:
+            if quiz_category_id==0:
+                questions = Question.query.all()
+            else:
+                questions = Question.query.filter_by(category=quiz_category_id).all()
 
-        if category_id==0:
-            questions = Question.query.all()
-        else:
-            questions = Question.query.filter_by(category=category_id).all()
+            questions = [question.format() for question in questions]
+            #Defining a function to get a questions not in the previous asked questions
+            def filter(question):
+                if question['id'] not in previous_asked_questions:
+                    return question
 
-        questions = [question.format() for question in questions]
-        #Getting the questions not in the previous asked questions
-        filtered_questions = []
-        for question in questions:
-            if question['id'] not in previous_questions:
-                filtered_questions.append(question)
-
-        if len(filtered_questions) == 0:
-            return jsonify({
-                'success': True
-            })
-
-        else:
-            #Getting a random question the filtered question
-            question = random.choice(filtered_questions)
-
+            questions_not_in_previous_asked_questions= map(filter, questions)
+            list_of_availabe_quiz_questions = list(questions_not_in_previous_asked_questions)
+            #Getting a random question from the list of available quiz question
+            random_quiz_question = random.choice(list_of_availabe_quiz_questions)
             return jsonify({
                 'success': True,
-                'question': question
+                'question': random_quiz_question
             })
+        except:
+            abort(400)
 
     """
     @TODO:

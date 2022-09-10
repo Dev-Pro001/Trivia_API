@@ -43,6 +43,11 @@ class TriviaTestCase(unittest.TestCase):
 
              
         self.quiz_question_400 = {
+            
+            'quiz_category': {
+                'id': 0
+            },
+            'previous_questions': None
            
         }
 
@@ -113,7 +118,7 @@ class TriviaTestCase(unittest.TestCase):
 
 
     def test_question_does_not_exist(self):
-        res = self.client().delete("/questions/2000")
+        res = self.client().delete("/questions/1000")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -133,7 +138,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category'], 5)
 
     def test_if_category_does_not_exist(self):
-        res = self.client().get('/categories/2000/questions')
+        res = self.client().get('/categories/1000/questions')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
