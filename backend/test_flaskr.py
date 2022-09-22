@@ -5,7 +5,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
 from models import setup_db, Question, Category
+from dotenv import load_dotenv
+import os 
 
+
+load_dotenv()
+
+DB_HOST= os.getenv('DB_HOST')
+PASSWORD= os.getenv('PASSWORD')
+TEST_DB_NAME = os.getenv('TEST_DB_NAME')
+DB_USER= os.getenv('DB_USER')
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -14,9 +23,8 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test_db"
-        self.database_path = "postgresql://{}:{}@{}/{}".format("postgres", "devpro001", "localhost:5432", self.database_name)
-        #"postgres://{}/{}".format('localhost:5432', self.database_name)
+        #self.database_name = "trivia_test_db"
+        self.database_path = "postgresql://{}:{}@{}/{}".format(DB_USER, PASSWORD, DB_HOST, TEST_DB_NAME)
         setup_db(self.app, self.database_path)
 
         self.new_question = {
@@ -76,7 +84,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['categories']))
 
-
+    #THIS TEST WILL ALWAYS FAIL SINCE THERE ARE CATEGORIES PRESENT IN THE DATABASE.
+    #HOWEVER IF THERE ARE NO CATEGORISE PRESENT i.e len(categories)==0, THE TEST WILL PASS
     def test_categories_not_found(self):
         res = self.client().get('/categories')
         data = json.loads(res.data)
