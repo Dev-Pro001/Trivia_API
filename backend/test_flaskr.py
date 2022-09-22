@@ -23,7 +23,6 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        #self.database_name = "trivia_test_db"
         self.database_path = "postgresql://{}:{}@{}/{}".format(DB_USER, PASSWORD, DB_HOST, TEST_DB_NAME)
         setup_db(self.app, self.database_path)
 
@@ -84,10 +83,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['categories']))
 
-    #THIS TEST WILL ALWAYS FAIL SINCE THERE ARE CATEGORIES PRESENT IN THE DATABASE.
-    #HOWEVER IF THERE ARE NO CATEGORISE PRESENT i.e len(categories)==0, THE TEST WILL PASS
+
     def test_categories_not_found(self):
-        res = self.client().get('/categories')
+        res = self.client().get('/categories/1000')
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 404)
